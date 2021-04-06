@@ -25,7 +25,10 @@ if (isset($_GET['logout'])) {
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet"
+        id="bootstrap-css">
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <style>
     body {
@@ -241,10 +244,8 @@ if (isset($_GET['logout'])) {
                 <div class="nav-item dropdown">
                     <a href="#" data-toggle="dropdown" class="nav-item nav-link dropdown-toggle">Services</a>
                     <div class="dropdown-menu">
-                        <a href="#" class="dropdown-item">Web Design</a>
-                        <a href="#" class="dropdown-item">Web Development</a>
-                        <a href="#" class="dropdown-item">Graphic Design</a>
-                        <a href="#" class="dropdown-item">Digital Marketing</a>
+                        <a href="status.php" class="dropdown-item">status</a>
+
                     </div>
                 </div>
                 <a href="#" class="nav-item nav-link" aria-disabled="true"><?php echo $_SESSION['email']; ?> </a>
@@ -256,6 +257,87 @@ if (isset($_GET['logout'])) {
 
         </div>
     </nav>
+    <!-- body -->
+    <div class="container" style="width:95%;">
+
+        <!-- Display all Food from food table -->
+        <?php
+
+        include_once 'user.php';
+        include_once './util.php';
+        include_once 'dbconnect.php';
+        $conn = new DBConnector();
+        $pdo = $conn->connectToDB();
+
+
+        $sql = "SELECT  COUNT(*) AS num FROM FOOD";
+        $stmt = $pdo->prepare($sql);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
+
+
+        if ($row['num'] > 0) {
+            $count = 0;
+ 
+            while ($row = $result) {
+                if ($count == 0)
+                    echo "<div class='row'>";
+
+        ?>
+        <div class="col-md-3">
+
+            <form method="post" action="cart.php?action=add&id=<?php echo $row["foodid"]; ?>">
+                <div class="mypanel" align="center" ;>
+                    <img src="<?php echo $row["images_path"]; ?>" class="img-responsive">
+                    <h4 class="text-dark"><?php echo $row["name"]; ?></h4>
+                    <h5 class="text-info"><?php echo $row["description"]; ?></h5>
+                    <h5 class="text-danger">&#8377; <?php echo $row["prize"]; ?>/-</h5>
+                    <h5 class="text-info">Quantity: <input type="number" min="1" max="25" name="quantity"
+                            class="form-control" value="1" style="width: 60px;"> </h5>
+                    <input type="hidden" name="hidden_name" value="<?php echo $row["name"]; ?>">
+                    <input type="hidden" name="hidden_price" value="<?php echo $row["prize"]; ?>">
+
+                    <input type="submit" name="add" style="margin-top:5px;" class="btn btn-success" value="Add to Cart">
+                </div>
+            </form>
+
+
+        </div>
+
+        <?php
+                $count++;
+                if ($count == 4) {
+                    echo "</div>";
+                    $count = 0;
+                }
+            }
+            ?>
+
+    </div>
+    </div>
+    <?php
+        } else {
+?>
+
+    <div class="container">
+        <div class="jumbotron">
+            <center>
+                <label style="margin-left: 5px;color: red;">
+                    <h1>Oops! No food is available.</h1>
+                </label>
+                <p>Stay Hungry...! :P</p>
+            </center>
+
+        </div>
+    </div>
+
+    <?php
+
+        }
+
+?>
+
 </body>
 
 </html>
